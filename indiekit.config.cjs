@@ -13,6 +13,7 @@ module.exports = {
     user: "getindiekit",
     repo: "sandbox",
     branch: "gh-pages",
+    lfs: ["jpg"],
   },
   "@indiekit/syndicator-mastodon": {
     checked: true,

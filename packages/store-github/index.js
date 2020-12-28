@@ -1,11 +1,18 @@
-import process from "node:process";
+import fs from "node:fs";
 import { Buffer } from "node:buffer";
+import got from "got";
 import octokit from "@octokit/rest";
 
 const defaults = {
   branch: "main",
-  token: process.env.GITHUB_TOKEN,
+  lfs: [],
 };
+
+function getFilesizeInBytes(filename) {
+  var stats = fs.statSync(filename);
+  var fileSizeInBytes = stats.size;
+  return fileSizeInBytes;
+}
 
 /**
  * @typedef Response
@@ -55,6 +62,12 @@ export const GithubStore = class {
     });
   }
 
+  get lfsServer() {
+    return this.options.lfsServer
+      ? this.options.lfsServer
+      : `https://github.com/${this.options.user}/${this.options.repo}.git/info/lfs/`;
+  }
+
   /**
    * Create file in a repository
    *
@@ -65,7 +78,36 @@ export const GithubStore = class {
    * @see {@link https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#create-or-update-file-contents}
    */
   async createFile(path, content, message) {
-    content = Buffer.from(content).toString("base64");
+    const extension = path.extname(path);
+
+    if (this.options.lfs.includes(extension)) {
+      // Upload file to LFS server
+      const version = "https://git-lfs.github.com/spec/v1";
+      const oid = "12345678";
+      const size = getFilesizeInBytes(content);
+      const response = got.post(this.gitLfsServer, {
+        headers: {
+          Accept: "application/vnd.git-lfs+json",
+          "Content-Type": "application/vnd.git-lfs+json",
+        },
+        responseType: "json",
+        json: {
+          operation: "upload",
+          transfers: ["basic"],
+          ref: {
+            name: `refs/heads/${this.options.branch}`,
+          },
+          objects: [{ oid, size }],
+        },
+      });
+
+      console.log(response);
+
+      content = `version ${version}\noid sha256:${oid}\nsize ${size}`;
+    } else {
+      content = Buffer.from(content).toString("base64");
+    }
+
     const response = await this.client.repos.createOrUpdateFileContents({
       owner: this.options.user,
       repo: this.options.repo,
