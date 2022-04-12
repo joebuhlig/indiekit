@@ -9,8 +9,10 @@ nav_order: 2
 You can install indiekit using:
 
 ```bash
-npm init && npm install @indiekit/indiekit
+npm init indiekit DIRECTORY_NAME
 ```
+
+Where `DIRECTORY_NAME` is the name of the directory where your configuration file will be saved.
 
 You can then start your server using:
 

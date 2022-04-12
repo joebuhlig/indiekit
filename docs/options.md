@@ -3,7 +3,6 @@ nav_order: 3
 ---
 
 # Configuration
-
 {: .no_toc }
 
 Indiekit uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) to find and load your configuration object. Starting from the current working directory, it looks for the following possible sources:
@@ -24,7 +23,7 @@ The `.indiekitrc` file (without extension) can be in JSON or YAML format. You ca
 The configuration object has the following properties:
 
 - TOC
-  {:toc}
+{:toc}
 
 ## application
 
@@ -130,11 +129,44 @@ _Optional_, defaults to the URL of your server (as provided by request headers).
 
 ## plugins
 
-TBD
+An array of plug-ins you wish to use with Indiekit. For example:
 
----
+```json
+{
+  "plugins": [
+    "@indiekit/preset-jekyll",
+    "@indiekit/store-github",
+    "@indiekit/syndicator-mastodon",
+    "@indiekit/syndicator-twitter",
+  ],
+}
+```
+
+Each plugin may accept its own configuration options, and these should be provided under a key with the plug-in’s name. For example:
+
+```json
+{
+  "@indiekit/preset-hugo": {
+    "frontMatterFormat": "yaml"
+  }
+}
+```
 
 ## publication
+
+### publication.authorizationEndpoint `URL`
+
+Authorisation endpoint.
+
+_Optional_, defaults to `"https://indieauth.com/auth"`. For example:
+
+```json
+{
+  "publication": {
+    "authorizationEndpoint": "https://example.org/auth"
+  }
+}
+```
 
 ### publication.categories `Array | URL`
 
