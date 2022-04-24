@@ -1,4 +1,4 @@
-import FormData from "form-data";
+import { FormData } from "undici";
 import got from "got";
 import { debug } from "../index.js";
 
