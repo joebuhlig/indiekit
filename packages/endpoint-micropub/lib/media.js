@@ -1,4 +1,4 @@
-import FormData from "form-data";
+import { FormData } from "undici";
 import got from "got";
 
 /**
@@ -15,19 +15,18 @@ export const uploadMedia = async (publication, properties, files) => {
   for await (const file of files) {
     // Create multipart/form-data
     const form = new FormData();
-    form.append("file", file.buffer, {
-      filename: file.originalname,
-      contentType: file.mimetype,
-    });
+    const blob = new Blob([file.buffer]);
+    form.append("file", blob, file.originalname);
 
     // Upload file via media endpoint
     let upload;
     try {
       upload = await got.post(mediaEndpoint, {
         body: form,
-        headers: form.getHeaders({
+        headers: {
           authorization: `Bearer ${bearerToken}`,
-        }),
+          "content-type": file.mimetype,
+        },
         responseType: "json",
       });
     } catch (error) {
