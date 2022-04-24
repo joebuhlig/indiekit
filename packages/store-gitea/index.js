@@ -1,6 +1,6 @@
 import process from "node:process";
 import { Buffer } from "node:buffer";
-import got from "got";
+import { fetch, request } from "undici";
 
 const defaults = {
   branch: "main",
@@ -56,14 +56,8 @@ export const GiteaStore = class {
     ];
   }
 
-  get client() {
-    return got.extend({
-      headers: {
-        authorization: `token ${this.options.token}`,
-      },
-      prefixUrl: `${this.options.instance}/api/v1/repos/${this.options.user}/${this.options.repo}/contents`,
-      responseType: "json",
-    });
+  get #prefixUrl() {
+    return `${this.options.instance}/api/v1/repos/${this.options.user}/${this.options.repo}/contents`;
   }
 
   /**
@@ -77,13 +71,21 @@ export const GiteaStore = class {
    */
   async createFile(path, content, message) {
     content = Buffer.from(content).toString("base64");
-    const response = await this.client.post(path, {
-      json: {
+    const url = new URL(path, this.#prefixUrl);
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        Authorization: `token ${this.options.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         branch: this.options.branch,
         content,
         message,
-      },
-    });
+      }),
+    };
+    const response = await request(url.href, requestOptions);
+    console.log(response);
     return response;
   }
 

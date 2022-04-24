@@ -1,7 +1,11 @@
 import test from "ava";
-import nock from "nock";
+import { MockAgent, setGlobalDispatcher } from "undici";
 import { Indiekit } from "@indiekit/indiekit";
 import { GiteaStore } from "../../index.js";
+
+const mockAgent = new MockAgent();
+mockAgent.disableNetConnect();
+setGlobalDispatcher(mockAgent);
 
 const gitea = new GiteaStore({
   token: "abc123",
@@ -55,9 +59,17 @@ test("Initiates plug-in", (t) => {
   t.is(indiekit.publication.store.info.name, "username/repo on Gitea");
 });
 
-test("Creates file in a repository", async (t) => {
-  nock(t.context.giteaUrl)
-    .post((uri) => uri.includes("foo.txt"))
+test.only("Creates file in a repository", async (t) => {
+  const mockPool = mockAgent.get("https://gitea.com");
+  // nock(t.context.giteaUrl)
+  //   .post((uri) => uri.includes("foo.txt"))
+  //   .reply(200, t.context.postResponse);
+
+  mockPool
+    .intercept({
+      path: "/api/v1/repos/username/repo/contents/foo.txt",
+      method: "POST",
+    })
     .reply(200, t.context.postResponse);
 
   const result = await gitea.createFile("foo.txt", "foo", "Message");
