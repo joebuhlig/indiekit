@@ -9,6 +9,7 @@ const defaults = {
 export const HugoPreset = class {
   constructor(options = {}) {
     this.id = "hugo";
+    this.meta = import.meta;
     this.name = "Hugo preset";
     this.options = { ...defaults, ...options };
   }
@@ -77,7 +78,7 @@ export const HugoPreset = class {
   /**
    * Post types
    *
-   * @returns {object} Post types config
+   * @returns {object} Post types configuration
    */
   get postTypes() {
     return [

@@ -32,7 +32,7 @@ export const testConfig = async (options) => {
     application: {
       locale: options.locale,
       mongodbUrl: options && options.useDatabase !== false ? mongodbUrl : false,
-      name: "Test config",
+      name: "Test configuration",
       sessionMiddleware: cookieSession({
         name: "test",
         secret: process.env.TEST_SESSION_SECRET,
@@ -47,6 +47,7 @@ export const testConfig = async (options) => {
       me: options?.publication?.me || process.env.TEST_PUBLICATION_URL,
       postTypes,
       timeZone: "UTC",
+      tokenEndpoint: options?.publication?.tokenEndpoint,
     },
     "@indiekit/store-github": {
       token: "abc123",

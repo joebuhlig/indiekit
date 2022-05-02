@@ -3,6 +3,7 @@ import YAML from "yaml";
 export const JekyllPreset = class {
   constructor() {
     this.id = "jekyll";
+    this.meta = import.meta;
     this.name = "Jekyll preset";
   }
 
@@ -15,7 +16,7 @@ export const JekyllPreset = class {
   /**
    * Post types
    *
-   * @returns {object} Post types config
+   * @returns {object} Post types configuration
    */
   get postTypes() {
     return [

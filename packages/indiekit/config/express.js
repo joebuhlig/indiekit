@@ -7,12 +7,12 @@ import { internationalisation } from "../lib/middleware/internationalisation.js"
 import { locals } from "../lib/middleware/locals.js";
 import { logging } from "../lib/middleware/logging.js";
 import { routes } from "../lib/routes.js";
+import { views } from "../lib/views.js";
 
 const { templates } = frontend;
 
 export const expressConfig = (indiekitConfig) => {
   const app = express();
-  const { application } = indiekitConfig;
 
   // Correctly report secure connections
   app.enable("trust proxy");
@@ -22,7 +22,7 @@ export const expressConfig = (indiekitConfig) => {
   app.use(express.urlencoded({ extended: true }));
 
   // Session
-  app.use(application.sessionMiddleware);
+  app.use(indiekitConfig.application.sessionMiddleware);
 
   // Force HTTPS
   if (process.env.NODE_ENV === "production") {
@@ -39,7 +39,7 @@ export const expressConfig = (indiekitConfig) => {
   app.use(logging);
 
   // Views
-  app.set("views", application.views);
+  app.set("views", views(indiekitConfig));
   app.engine("njk", templates(app).render);
   app.set("view engine", "njk");
 

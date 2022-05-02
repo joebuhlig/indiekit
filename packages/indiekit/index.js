@@ -37,12 +37,7 @@ export const Indiekit = class {
   }
 
   extend(type, extension) {
-    const extensionTypes = [
-      "navigationItems",
-      "routes",
-      "routesPublic",
-      "views",
-    ];
+    const extensionTypes = ["navigationItems", "routes", "routesPublic"];
 
     if (!extensionTypes.includes(type)) {
       throw new TypeError(`${type} is not a valid extension type`);
@@ -123,7 +118,7 @@ export const Indiekit = class {
   async server(options = {}) {
     const { application, server } = this.config;
 
-    // Merge options with default server config
+    // Merge options with default server configuration
     options = { ...server, ...options };
 
     const { name, version } = application;

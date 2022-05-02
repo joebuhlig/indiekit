@@ -12,33 +12,28 @@ const defaults = {
 export const MediaEndpoint = class {
   constructor(options = {}) {
     this.id = "endpoint-media";
+    this.meta = import.meta;
     this.name = "Micropub media endpoint";
     this.options = { ...defaults, ...options };
     this._router = express.Router(); // eslint-disable-line new-cap
   }
 
-  routes(application, publication) {
+  get routes() {
     const router = this._router;
     const multipartParser = multer({
       storage: multer.memoryStorage(),
     });
 
-    router.get("/", queryController(publication));
-    router.post(
-      "/",
-      multipartParser.single("file"),
-      uploadController(publication)
-    );
-    router.get("/files", filesController(application, publication).list);
-    router.get("/files/:id", filesController(application, publication).view);
+    router.get("/", queryController);
+    router.post("/", multipartParser.single("file"), uploadController);
+    router.get("/files", filesController.list);
+    router.get("/files/:id", filesController.view);
 
     return router;
   }
 
   init(Indiekit) {
-    const { application, publication } = Indiekit.config;
-
-    if (application.hasDatabase) {
+    if (Indiekit.config.application.hasDatabase) {
       Indiekit.extend("navigationItems", {
         href: `${this.options.mountPath}/files`,
         text: "media.title",
@@ -47,14 +42,10 @@ export const MediaEndpoint = class {
 
     Indiekit.extend("routes", {
       mountPath: this.options.mountPath,
-      routes: () => this.routes(application, publication),
+      routes: () => this.routes,
     });
 
-    Indiekit.extend("views", [
-      fileURLToPath(new URL("views", import.meta.url)),
-    ]);
-
-    application.mediaEndpoint = this.options.mountPath;
+    Indiekit.config.application.mediaEndpoint = this.options.mountPath;
   }
 };
 

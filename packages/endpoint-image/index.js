@@ -10,6 +10,7 @@ const defaults = {
 export const ImageEndpoint = class {
   constructor(options = {}) {
     this.id = "endpoint-image";
+    this.meta = import.meta;
     this.name = "Image resizing endpoint";
     this.options = { ...defaults, ...options };
     this._router = express.Router(); // eslint-disable-line new-cap
@@ -19,7 +20,6 @@ export const ImageEndpoint = class {
     let cache;
     if (application.hasDatabase) {
       const store = new KeyvMongoDB({
-        collection: "cache",
         url: application.mongodbUrl,
       });
       cache = new Keyv({ store });

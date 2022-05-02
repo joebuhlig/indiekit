@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import express from "express";
 import frontend from "@indiekit/frontend";
 import rateLimit from "express-rate-limit";
@@ -21,7 +22,6 @@ export const routes = (indiekitConfig) => {
 
   const indieauth = new IndieAuth({
     me: publication.me,
-    tokenEndpoint: publication.tokenEndpoint,
   });
 
   // Prevent pages from being indexed
@@ -43,10 +43,11 @@ export const routes = (indiekitConfig) => {
   router.use("/assets", express.static(assetsPath));
   router.get("/assets/app.css", assetsController.getStyles);
 
-  // Syndicator assets
-  for (const target of publication.syndicationTargets) {
-    if (target.assetsPath) {
-      router.use(`/assets/${target.id}`, express.static(target.assetsPath));
+  // Plug-in assets
+  for (const plugin of application.installedPlugins) {
+    if (plugin.meta?.url) {
+      const assetsPath = fileURLToPath(new URL("assets", plugin.meta.url));
+      router.use(`/assets/${plugin.id}`, express.static(assetsPath));
     }
   }
 

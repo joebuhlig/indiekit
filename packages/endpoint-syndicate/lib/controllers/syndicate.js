@@ -5,16 +5,15 @@ import { getPostData } from "../utils.js";
 
 const debug = new Debug("indiekit:endpoint-syndicate");
 
-export const syndicateController = (application, publication) => ({
+export const syndicateController = {
   async post(request, response, next) {
-    const { token } = request.query;
-
     try {
+      const { application, publication } = request.app.locals;
+      const { token } = request.query;
+
       if (!application.hasDatabase) {
         throw new Error(response.__("errors.noDatabase.content"));
       }
-
-      const syndication = [];
 
       // Get syndication targets
       const { syndicationTargets } = publication;
@@ -53,6 +52,7 @@ export const syndicateController = (application, publication) => ({
       }
 
       // Syndicate to target(s)
+      const syndication = [];
       for await (const target of syndicationTargets) {
         const { uid } = target.info;
         const canSyndicate = syndicateTo.includes(uid);
@@ -67,7 +67,6 @@ export const syndicateController = (application, publication) => ({
 
       // Update post with syndicated URL(s) and removal of syndication target(s)
       const updated = await got.post(publication.micropubEndpoint, {
-        responseType: "json",
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -79,6 +78,7 @@ export const syndicateController = (application, publication) => ({
             syndication,
           },
         },
+        responseType: "json",
       });
 
       if (updated) {
@@ -98,4 +98,4 @@ export const syndicateController = (application, publication) => ({
       }
     }
   },
-});
+};
