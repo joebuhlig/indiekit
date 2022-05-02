@@ -4,7 +4,6 @@ import newbase60 from "newbase60";
 import slugify from "@sindresorhus/slugify";
 import { v4 as uuidv4 } from "uuid";
 import { getServerTimeZone } from "./date.js";
-import { PostTypeCount } from "./post-type-count.js";
 
 const { format } = dateFnsTz;
 
@@ -108,10 +107,9 @@ export const relativeMediaPath = (url, me) =>
  * @param {string} path URI template path
  * @param {object} properties Properties to use
  * @param {string} timeZoneSetting Time zone setting
- * @param {object} publication Publication configuration
  * @returns {string} Path
  */
-export const renderPath = (path, properties, timeZoneSetting, publication) => {
+export const renderPath = (path, properties, timeZoneSetting) => {
   let tokens = {};
   const dateObject = new Date(properties.published);
   const serverTimeZone = getServerTimeZone();
@@ -150,9 +148,6 @@ export const renderPath = (path, properties, timeZoneSetting, publication) => {
 
   // Add day of the year (NewBase60) token
   tokens.D60 = newbase60.DateToSxg(dateObject); // eslint-disable-line new-cap
-
-  // Add count of post type token
-  tokens.n = PostTypeCount.count(publication, properties);
 
   // Add slug token if 'mp-slug' property
   if (properties["mp-slug"]) {

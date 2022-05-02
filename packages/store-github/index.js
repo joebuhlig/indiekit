@@ -98,25 +98,6 @@ export const GithubStore = class {
   }
 
   /**
-   * Count files in a repository path
-   *
-   * @param {string} path Path to directory
-   * @returns {Promise<Response>} A promise to the response
-   * @see {@link https://docs.github.com/en/rest/repos/contents#get-repository-content}
-   */
-  async countFiles(path) {
-    const response = await this.client.repos.getContent({
-      owner: this.options.user,
-      repo: this.options.repo,
-      ref: this.options.branch,
-      path,
-    });
-    const count = response.data.length;
-
-    return count;
-  }
-
-  /**
    * Update file in a repository
    *
    * @param {string} path Path to file
